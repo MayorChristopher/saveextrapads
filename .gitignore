@@ -1,0 +1,28 @@
+# Ignore system files
+.DS_Store
+
+# Ignore environment variables
+.env
+server/.env
+
+# Ignore dependencies
+node_modules/
+
+# Ignore Vite/React build output
+dist/
+
+# Ignore Vercel/Netlify local config
+.vercel/
+.netlify/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor configs
+.vscode/
+
+# Ignore output from Tailwind CLI (if any)
+*.css.map
