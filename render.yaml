@@ -14,7 +14,7 @@ services:
         value: 5000
       - key: SUPABASE_URL
         value: https://kgibwaefgowvwtzypoaz.supabase.co
-      - key: SUPABASE_SERVICE_KEY
+      - key: SUPABASE_ANON_KEY
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnaWJ3YWVmZ293dnd0enlwb2F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUzNDUwMzMsImV4cCI6MjA2MDkyMTAzM30.OR_gAvByjuzQTcH_k3Kl-n5VfQyNnzZ3JkjGfO8QF8s
       - key: RESEND_API_KEY
         value: re_LhAjQjTr_PRThTf4forS4z8dP1JrgZxPq
