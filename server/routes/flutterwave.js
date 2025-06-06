@@ -9,7 +9,17 @@ dotenv.config();
 const router = express.Router();
 
 // Instantiate Flutterwave
-const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
+const flw = new Flutterwave(
+  process.env.FLW_PUBLIC_KEY,
+  process.env.FLW_SECRET_KEY
+);
+if (!process.env.FLW_PUBLIC_KEY || !process.env.FLW_SECRET_KEY) {
+  console.error("🚨 Missing Flutterwave API keys in environment variables");
+  process.exit(1);
+}
+console.log("Flutterwave Public Key:", process.env.FLW_PUBLIC_KEY);
+console.log("Flutterwave Secret Key:", process.env.FLW_SECRET_KEY);
+
 
 router.post('/', async (req, res) => {
   const { total, email, name, orderId } = req.body;
