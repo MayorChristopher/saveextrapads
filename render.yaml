@@ -8,13 +8,13 @@ services:
     rootDir: .
     autoDeploy: true
     envVars:
-  - key: NODE_ENV
-    value: production
-  - key: PORT
-    value: 5000
-  - key: SUPABASE_URL
-    value: https://kgibwaefgowvwtzypoaz.supabase.co
-  - key: SUPABASE_SERVICE_KEY
-    value: ${SUPABASE_SERVICE_KEY} 
-  - key: RESEND_API_KEY
-    value: ${RESEND_API_KEY}
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: SUPABASE_URL
+        value: ${SUPABASE_URL}
+      - key: SUPABASE_SERVICE_KEY
+        value: ${SUPABASE_SERVICE_KEY}
+      - key: RESEND_API_KEY
+        value: ${RESEND_API_KEY}
