@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
   try {
     const payload = {
       tx_ref: `saveextra_${Date.now()}`,
-      amount: parseFloat(total).toFixed(2),
+      amount: (Math.round(Number(total) * 100) / 100).toFixed(2),
       currency: "NGN",
       redirect_url: `${process.env.FRONTEND_URL}/order-complete`,
       payment_options: "card,banktransfer,ussd",
@@ -63,14 +63,15 @@ router.post('/', async (req, res) => {
 });
 
 // ✅ Flutterwave Webhook Endpoint
-router.post('/api/payments/flutterwave/webhook/flutterwave', express.raw({ type: '*/*' }), async (req, res) => {
+router.post('/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   const rawBody = req.body;
 
   const hash = crypto.createHmac("sha256", process.env.FLW_SECRET_HASH)
     .update(rawBody)
     .digest("hex");
 
-  const incomingHash = req.headers['verif-hash'] || req.headers['Verif-Hash'];
+  const incomingHash = req.headers['verif-hash'] || req.headers['verif-Hash'] || req.headers['Verif-Hash'];
+
 
 
   if (incomingHash !== hash) {
@@ -87,6 +88,22 @@ router.post('/api/payments/flutterwave/webhook/flutterwave', express.raw({ type:
   const tx_ref = event.data.tx_ref;
   const flw_tx_id = event.data.id;
 
+  const { data: tokenData, error: fetchError } = await supabase
+    .from("flutterwave_tokens")
+    .select("order_id")
+    .eq("tx_ref", tx_ref)
+    .single();
+
+  if (!tokenData) {
+    return res.status(404).json({ message: "No order mapped to tx_ref" });
+  }
+
+
+  if (fetchError || !tokenData?.order_id) {
+    console.error("Order mapping failure", fetchError);
+    return res.status(404).json({ message: "Order not found for tx_ref" });
+  }
+
   try {
     const verification = await flw.Transaction.verify({ id: flw_tx_id });
 
@@ -99,17 +116,16 @@ router.post('/api/payments/flutterwave/webhook/flutterwave', express.raw({ type:
       return res.status(400).json({ message: "Transaction verification failed" });
     }
 
-
-    const { data: tokenData, error: fetchError } = await supabase
-      .from("flutterwave_tokens")
-      .select("order_id")
-      .eq("tx_ref", tx_ref)
+    const { data: existingOrder } = await supabase
+      .from("orders")
+      .select("status")
+      .eq("id", tokenData.order_id)
       .single();
 
-    if (fetchError || !tokenData?.order_id) {
-      console.error("Order mapping failure", fetchError);
-      return res.status(404).json({ message: "Order not found for tx_ref" });
+    if (existingOrder?.status === "completed") {
+      return res.status(200).json({ message: "Order already completed" });
     }
+
 
     const { error: updateError } = await supabase
       .from("orders")

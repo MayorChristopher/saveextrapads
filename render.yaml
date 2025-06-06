@@ -8,13 +8,29 @@ services:
     rootDir: server
     autoDeploy: true
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 5000
-      - key: SUPABASE_URL
-        value: https://kgibwaefgowvwtzypoaz.supabase.co
-      - key: SUPABASE_ANON_KEY
-        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnaWJ3YWVmZ293dnd0enlwb2F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUzNDUwMzMsImV4cCI6MjA2MDkyMTAzM30.OR_gAvByjuzQTcH_k3Kl-n5VfQyNnzZ3JkjGfO8QF8s
-      - key: RESEND_API_KEY
-        value: re_LhAjQjTr_PRThTf4forS4z8dP1JrgZxPq
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: 5000
+  - key: SUPABASE_URL
+    value: https://kgibwaefgowvwtzypoaz.supabase.co
+  - key: SUPABASE_ANON_KEY
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  - key: RESEND_API_KEY
+    value: re_LhAjQjTr_PRThTf4forS4z8dP1JrgZxPq
+
+  # 🔐 Add these Flutterwave credentials
+  - key: FLW_PUBLIC_KEY
+    value: FLWPUBK_TEST-6b77c1347146068f36f69f1b2d3cc99c-X
+  - key: FLW_SECRET_KEY
+    value: FLWSECK_TEST-eeaf94bd956775429194a4d3efcde586-X
+  - key: FLW_ENCRYPTION_KEY
+    value: FLWSECK_TEST834bd08aa2e0
+  - key: FLW_SECRET_HASH
+    value: 123456789
+
+  # ✅ PayPal keys (optional if not using Flutterwave fallback)
+  - key: PAYPAL_CLIENT_ID
+    value: AQqh4-OQ0q-U-g9yazV8kgvtzNA4FuZBUFJKwUv1VGGxSIU6D8tyne3E2EJ7KYudTGmG3sw5UOJ6gC8Q
+  - key: PAYPAL_SECRET
+    value: EPCnWl6lqS2qpRDknBRNj1YJrmhQaNfv_96LwZ8IgsAPSXUYWyUhIiGlGTy1Ak1qS5GLFdh1ra_FXvfk
