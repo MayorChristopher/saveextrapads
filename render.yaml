@@ -15,6 +15,6 @@ services:
   - key: SUPABASE_URL
     value: YOUR_SUPABASE_URL
   - key: SUPABASE_SERVICE_KEY
-    value: ${SUPABASE_SERVICE_KEY} # reference secret from Render dashboard
+    value: ${SUPABASE_SERVICE_KEY} 
   - key: RESEND_API_KEY
     value: ${RESEND_API_KEY}
