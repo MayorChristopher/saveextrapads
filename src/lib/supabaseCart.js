@@ -20,16 +20,14 @@ export const saveCartToSupabase = async (userId, items) => {
 
 // Load cart
 export const loadCartFromSupabase = async (userId) => {
-  if (!userId) {
-    throw new Error('User ID is required to load cart.');
-  }
+  if (!userId) throw new Error('User ID required.');
 
   try {
     const { data, error } = await supabase
       .from('user_carts')
       .select('cart_items')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -40,6 +38,7 @@ export const loadCartFromSupabase = async (userId) => {
     return [];
   }
 };
+
 
 export async function loadCartOnLogin() {
   const { user } = useAuth.getState();
