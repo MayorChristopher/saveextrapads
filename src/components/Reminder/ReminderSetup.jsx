@@ -184,7 +184,7 @@ const ReminderSetup = () => {
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="mb-4">
                 <Button
                   type="button"
                   variant={formData.notificationType === "email" ? "default" : "outline"}

@@ -69,14 +69,14 @@ const Home = () => {
                 Experience eco-friendly, ultra-affordable sanitary pads designed
                 for your comfort and our planet's future.
               </p>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/shop">
-                  <Button size="lg">
+                  <Button size="lg" className="w-full sm:w-auto text-lg sm:text-xl">
                     Shop Now <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link to="/benefits">
-                  <Button variant="outline" size="lg">
+                <Link to="/benefits" className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg sm:text-xl">
                     Learn More
                   </Button>
                 </Link>
@@ -149,15 +149,17 @@ const Home = () => {
         </div>
       </section>
 
+
       {/* CTA Section */}
       <section className="section-padding bg-primary text-white">
-        <div className="container-custom text-center">
+        <div className="container-custom max-w-xl mx-auto text-center px-4">
           <h2 className="text-3xl font-bold mb-4">Join the Movement</h2>
           <p className="text-lg mb-8">
             Subscribe to our newsletter for updates, tips, and exclusive offers
           </p>
-          <NewsletterForm />
-
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <NewsletterForm className="flex-grow min-w-0" />
+          </div>
         </div>
       </section>
     </div>

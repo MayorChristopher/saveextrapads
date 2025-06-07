@@ -7,7 +7,7 @@ export function NewsletterForm() {
 
   return (
     <div className="max-w-md mx-auto">
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 w-full">
         <input
           type="email"
           value={email}
