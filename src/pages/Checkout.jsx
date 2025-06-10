@@ -37,6 +37,8 @@ const checkoutSchema = z.object({
   paymentMethod: z.enum(["paypal", "flutterwave"]),
 });
 
+
+
 const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -47,6 +49,22 @@ const Checkout = () => {
   const [shippingFee, setShippingFee] = useState(0);
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
+  useEffect(() => {
+    if (!user) {
+      toast({
+        title: "Please log in to continue",
+        description: "Your cart will be saved and restored after login.",
+      });
+
+      // Delay navigation slightly to allow toast to render
+      setTimeout(() => {
+        navigate("/auth", {
+          state: { from: "/checkout" },
+          replace: true,
+        });
+      }, 1500);
+    }
+  }, [user]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -105,6 +123,12 @@ const Checkout = () => {
         }
       } else {
         setTotal(baseTotal);
+        toast({
+          title: "Conversion Notice",
+          description: "Unable to convert to USD. Showing NGN instead.",
+          variant: "default"
+        });
+
       }
     };
     computeTotal();
@@ -118,8 +142,9 @@ const Checkout = () => {
     setFormData((prev) => ({
       ...prev,
       city: updatedCity,
-      paymentMethod: formData.country === "Nigeria" ? "flutterwave" : prev.paymentMethod,
+      paymentMethod: formData.country === "Nigeria" ? "flutterwave" : "paypal",
     }));
+
   }, [formData.country]);
 
 
@@ -213,7 +238,9 @@ const Checkout = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "PayPal initiation failed.");
         window.location.href = data.link;
-        return;
+        if (!data?.link) throw new Error("Payment link not received.");
+        window.location.href = data.link;
+
       }
 
       if (formData.paymentMethod === "flutterwave") {
@@ -230,7 +257,9 @@ const Checkout = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Flutterwave initiation failed.");
         window.location.href = data.link;
-        return;
+        if (!data?.link) throw new Error("Payment link not received.");
+        window.location.href = data.link;
+
       }
 
     } catch (error) {
@@ -254,6 +283,28 @@ const Checkout = () => {
     <div className="bg-gradient-to-b from-secondary to-background">
       <div className="container-custom py-20">
         <div className="grid md:grid-cols-2 gap-12">
+          {formData.country && (
+            <div className="bg-muted border border-border p-4 rounded-md text-sm mb-6">
+              <strong>Notice:</strong>{" "}
+              {formData.country === "Nigeria" ? (
+                <>
+                  You are checking out from <strong>Nigeria</strong>. Your payment method is set to{" "}
+                  <strong>Flutterwave (₦ NGN)</strong>. Shipping fees are based on your selected Nigerian city.
+                </>
+              ) : (
+                <>
+                  You are checking out from <strong>{formData.country}</strong>. Your payment method is set to{" "}
+                  <strong>PayPal ($ USD)</strong>. Shipping fees are location-based and will be converted to USD.
+                </>
+              )}
+            </div>
+          )}
+          {!user && (
+            <div className="bg-yellow-100 p-4 rounded text-center mb-6">
+              Please log in to complete your purchase. Your cart will be saved.
+            </div>
+          )}
+
           {/* Left: Checkout Form */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 120 }}>
             <div className="glass-card p-8 rounded-xl">
@@ -317,16 +368,20 @@ const Checkout = () => {
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex justify-between items-center">
                     <span>{item.name}</span>
-                    <span>{formatCurrency(item.price)}</span>
+                    <span>{formatCurrency(item.price, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span>
                   </div>
                 ))}
                 <div className="border-t pt-4">
-                  <div className="flex justify-between"><span>Subtotal</span><span>{formatCurrency(subtotal)}</span></div>
+                  <div className="flex justify-between"><span>Subtotal</span><span>{formatCurrency(subtotal, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span></div>
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>{formatCurrency(shippingFee)}</span>
+                    <span>{formatCurrency(shippingFee, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-lg"><span>Total</span><span>{formatCurrency(total)}</span></div>
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>Total</span>
+                    <span>{formatCurrency(total, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span>
+
+                  </div>
                 </div>
               </div>
             </div>

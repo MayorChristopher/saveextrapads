@@ -1,8 +1,10 @@
-import { cn } from '@/lib/utils';
+// src/components/ui/toast.jsx
 import * as ToastPrimitives from '@radix-ui/react-toast';
-import { cva } from 'class-variance-authority';
 import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { cva } from 'class-variance-authority';
 import React from 'react';
+
 
 const ToastProvider = ToastPrimitives.Provider;
 
@@ -95,7 +97,7 @@ export {
 	ToastAction,
 	ToastClose,
 	ToastDescription,
-	ToastProvider,
+	ToastProvider as RadixToastProvider,
 	ToastTitle,
 	ToastViewport,
 };

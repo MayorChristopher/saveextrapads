@@ -19,6 +19,9 @@ const Cart = () => {
     (acc, item) => acc + item.price * (item.quantity || 1),
     0
   );
+  const shippingFee = 0; // placeholder — real value calculated on /checkout
+  const grandTotal = total + shippingFee;
+
 
   return (
     <div>
@@ -56,46 +59,38 @@ const Cart = () => {
                     key={item.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="glass-card p-4 flex items-center gap-4 rounded-lg"
+                    className="glass-card p-4 rounded-lg flex flex-col sm:flex-row sm:items-center gap-4"
                   >
                     <img
                       src={item.imageUrl}
                       alt={item.name}
-                      className="w-20 h-20 object-cover rounded-lg"
+                      className="w-full sm:w-20 sm:h-20 object-cover rounded-lg"
                     />
                     <div className="flex-1">
                       <h3 className="font-semibold">{item.name}</h3>
-                      <p className="text-gray-600 text-sm">
-                        {item.description}
-                      </p>
+                      <p className="text-gray-600 text-sm">{item.description}</p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 self-start sm:self-center">
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() =>
-                          updateQuantity(item.id, (item.quantity || 1) - 1)
-                        }
+                        onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
                         disabled={(item.quantity || 1) <= 1}
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
-                      <span className="w-8 text-center">
-                        {item.quantity || 1}
-                      </span>
+                      <span className="w-8 text-center">{item.quantity || 1}</span>
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() =>
-                          updateQuantity(item.id, (item.quantity || 1) + 1)
-                        }
+                        onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
 
-                    <div className="text-right min-w-[100px]">
+                    <div className="text-right min-w-[100px] self-end sm:self-center">
                       <div className="font-semibold">
                         {formatCurrency(item.price * (item.quantity || 1))}
                       </div>
@@ -106,7 +101,7 @@ const Cart = () => {
                         onClick={() => removeFromCart(item.id)}
                       >
                         <Trash2 className="h-4 w-4" />
-                      </Button> 
+                      </Button>
                     </div>
                   </motion.div>
                 ))}
@@ -119,13 +114,14 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between mb-4">
                   <span>Shipping</span>
-                  <span className="text-green-600">Free</span>
+                  <span className={shippingFee === 0 ? "text-green-600" : ""}>
+                    {shippingFee === 0 ? 'Free' : formatCurrency(shippingFee)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                <span>{formatCurrency(total)}</span>
+                  <span>{formatCurrency(grandTotal)}</span>
                 </div>
-
                 <Link to="/checkout">
                   <Button className="w-full mt-6">Proceed to Checkout</Button>
                 </Link>

@@ -9,29 +9,35 @@ const PasswordReset = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleResetPassword = async () => {
-    if (!email) {
-      toast.error("Please enter your email address");
-      return;
-    }
+const handleResetPassword = async () => {
+  if (!email) {
+    toast.error("Please enter your email address");
+    return;
+  }
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: `${window.location.origin}/update-password`,
-});
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${import.meta.env.VITE_SITE_URL}/update-password`,
+    });
 
-      if (error) throw error;
+    if (error) throw error;
 
-      setIsSuccess(true);
-      toast.success("Password reset email sent!");
-    } catch (error) {
+    setIsSuccess(true);
+    toast.success("Password reset email sent!");
+  } catch (error) {
+    console.error("Reset error:", error); 
+    if (error?.message?.includes("over_email_send_rate_limit")) {
+      toast.error("Please wait a few seconds before requesting another reset email.");
+    } else {
       toast.error(error.message || "Something went wrong");
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">

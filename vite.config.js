@@ -160,6 +160,7 @@ export default defineConfig({
 	  cors: true,
 	  headers: {
 		'Cross-Origin-Embedder-Policy': 'credentialless',
+		 historyApiFallback: true,
 	  },
 	  allowedHosts: true,
 	  proxy: {

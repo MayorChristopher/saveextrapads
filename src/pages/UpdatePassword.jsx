@@ -14,7 +14,6 @@ const UpdatePassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [successDialog, setSuccessDialog] = useState(false);
   const navigate = useNavigate();
@@ -23,13 +22,15 @@ const UpdatePassword = () => {
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
     const token = params.get("access_token");
-    if (!token) {
-      toast.error("Invalid or expired reset link");
-      navigate("/auth");
-      return;
-    }
-    setAccessToken(token);
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!token || !data.session) {
+        toast.error("Invalid or expired reset link");
+        navigate("/auth");
+      }
+    });
   }, [navigate]);
+
 
   const handlePasswordUpdate = async () => {
     if (!password || !confirmPassword) {
@@ -48,7 +49,7 @@ const UpdatePassword = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password }, { accessToken });
+      const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
       setSuccessDialog(true);
@@ -60,8 +61,6 @@ const UpdatePassword = () => {
   };
 
   const passwordStrength = zxcvbn(password);
-
-  if (!accessToken) return <Spinner />;
 
   return (
     <>
@@ -105,15 +104,14 @@ const UpdatePassword = () => {
 
             <div className="h-2 rounded bg-gray-200 overflow-hidden">
               <div
-                className={`h-full transition-all duration-300 ${
-                  passwordStrength.score >= 3
-                    ? "bg-green-500 w-full"
-                    : passwordStrength.score === 2
+                className={`h-full transition-all duration-300 ${passwordStrength.score >= 3
+                  ? "bg-green-500 w-full"
+                  : passwordStrength.score === 2
                     ? "bg-yellow-500 w-2/3"
                     : passwordStrength.score === 1
-                    ? "bg-orange-500 w-1/3"
-                    : "bg-red-500 w-1/4"
-                }`}
+                      ? "bg-orange-500 w-1/3"
+                      : "bg-red-500 w-1/4"
+                  }`}
               />
             </div>
             <p className="text-sm text-gray-500">

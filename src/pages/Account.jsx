@@ -49,6 +49,7 @@ const Account = () => {
   const navigate = useNavigate();
   const [modalOrder, setModalOrder] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [nameSaved, setNameSaved] = useState(false);
 
 
 
@@ -104,12 +105,14 @@ const Account = () => {
     setIsLoading(true);
 
     const ext = file.name.split(".").pop();
-    const path = `user-images/${user.id}-${Date.now()}`;
+    const path = `profile-pics/${user.id}-${Date.now()}.${ext}`;
+
 
 
     const { error: uploadError } = await supabase.storage
       .from("profile-pics")
       .upload(path, file, { upsert: true });
+
 
     if (uploadError) {
       toast.error("Upload failed.");
@@ -144,11 +147,25 @@ const Account = () => {
   const handleNameUpdate = async () => {
     if (name === user?.user_metadata?.name) return;
     setIsLoading(true);
-    const { error } = await supabase.auth.updateUser({ data: { name } });
+
+    const { error } = await supabase.auth.updateUser({
+      data: { name, full_name: name },
+    });
+
+    const { data: refreshedUser } = await supabase.auth.getUser();
+    updateUser(refreshedUser?.user);
+
     if (error) toast.error("Failed to update name.");
-    else toast.success("Name updated.");
+    else {
+      toast.success("Name updated.");
+      setNameSaved(true);
+      setTimeout(() => setNameSaved(false), 3000);
+    }
+
     setIsLoading(false);
   };
+
+
 
   const handleLogout = async () => {
     await signOut();
@@ -282,60 +299,75 @@ const Account = () => {
             </TabsList>
 
             <TabsContent value="profile">
-              <div className="flex flex-col items-center space-y-4">
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="cursor-pointer"
-                >
-                  {imageUrl ? (
-                    <motion.img
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                      src={imageUrl}
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 bg-gray-300 rounded-full" />
-                  )}
+              <div className="grid sm:grid-cols-3 gap-6 items-start">
+                {/* Profile Image Column */}
+                <div className="flex flex-col items-center space-y-4">
+                  <div onClick={() => fileInputRef.current?.click()} className="cursor-pointer">
+                    {imageUrl ? (
+                      <motion.img
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                        src={imageUrl}
+                        alt="Profile"
+                        className="w-28 h-28 object-cover border border-gray-300 shadow-md rounded-md"
+                      />
+                    ) : (
+                      <div className="w-28 h-28 bg-gray-200 rounded-full" />
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    hidden
+                  />
+                  <p className="text-sm text-gray-500 text-center">Click to change photo</p>
                 </div>
 
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  hidden
-                />
+                {/* Profile Form Column */}
+                <div className="sm:col-span-2 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <Input value={name} onChange={(e) => setName(e.target.value)} />
+                    <Button
+                      onClick={handleNameUpdate}
+                      disabled={isLoading}
+                      className="mt-2 w-full sm:w-auto py-3 px-6 text-base"
+                    >
+                      {isLoading ? "Updating..." : "Save Changes"}
+                    </Button>
+                    {nameSaved && (
+                      <p className="text-sm text-green-600 mt-1">Changes saved successfully ✅</p>
+                    )}
 
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                />
-                <Button onClick={handleNameUpdate} disabled={isLoading}>
-                  {isLoading ? "Updating..." : "Save Name"}
-                </Button>
+                  </div>
 
-                <Button onClick={handleLogout} variant="destructive" className="w-full">
-                  Logout
-                </Button>
+                  <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                    <Button onClick={handleLogout} variant="destructive" className="w-full sm:w-auto">
+                      Logout
+                    </Button>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="link">Forgot Password?</Button>
-                  </DialogTrigger>
-                  <DialogContent className="w-full sm:max-w-xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Reset Password</DialogTitle>
-                      <DialogDescription>Enter your email to reset your password.</DialogDescription>
-                    </DialogHeader>
-                    <PasswordReset />
-                  </DialogContent>
-                </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" className="w-full sm:w-auto">
+                          Forgot Password?
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="w-full sm:max-w-xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Reset Password</DialogTitle>
+                          <DialogDescription>Enter your email to reset your password.</DialogDescription>
+                        </DialogHeader>
+                        <PasswordReset />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
               </div>
             </TabsContent>
+
 
             <TabsContent value="orders" className="mt-4 px-2 sm:px-0">
 

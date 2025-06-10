@@ -1,7 +1,9 @@
+// 🔐 Load environment first BEFORE anything else
+import './load-env.js';
+
 import express from 'express';
 import cors from 'cors';
 import cron from 'node-cron';
-import dotenv from 'dotenv';
 import listEndpoints from 'express-list-endpoints';
 import bodyParser from 'body-parser';
 
@@ -12,21 +14,13 @@ import contactRoute from './routes/send-contact-email.js';
 import reminderRouter from './routes/reminder.js';
 import { processReminders } from './lib/reminderProcessor.js';
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS for all routes
 app.use(cors());
-
-// Handle raw body for Flutterwave Webhooks
 app.use('/api/payments/flutterwave/webhook', bodyParser.raw({ type: '*/*' }));
-
-// Standard JSON body parsing
 app.use(express.json());
 
-// Route registration
 app.use('/api/payments/paypal', paypalRouter);
 app.use('/api/payments/flutterwave', flutterwaveRouter);
 app.use('/api/send-subscription-email', emailRoute);
@@ -36,12 +30,10 @@ app.use('/api/reminders', reminderRouter);
 // Log all routes
 logRegisteredRoutes(app);
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
 
-// CRON: 8 AM daily reminder job
 cron.schedule('0 8 * * *', async () => {
   console.log('🔔 Running scheduled reminder process...');
   try {
@@ -52,7 +44,6 @@ cron.schedule('0 8 * * *', async () => {
   }
 });
 
-// Utility to list all active routes
 function logRegisteredRoutes(app) {
   console.log('\n📌 Registered Routes:');
   listEndpoints(app).forEach((route) => {

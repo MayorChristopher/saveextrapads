@@ -1,15 +1,17 @@
 // src/lib/formatCurrency.js
 
 /**
- * Formats a number as a localized currency string.
- * 
- * @param {number} value - The numeric value to format.
- * @param {string} [locale='en-NG'] - The locale string, defaults to Nigerian English.
- * @param {string} [currency='NGN'] - The currency code, defaults to Nigerian Naira.
+ * Formats a numeric value as currency based on locale and currency code.
+ *
+ * @param {number} value - The numeric amount to format.
+ * @param {string} currency - Currency code (e.g., 'USD', 'NGN').
  * @returns {string} - Formatted currency string.
  */
-export const formatCurrency = (value, locale = 'en-NG', currency = 'NGN') => {
-  if (typeof value !== 'number') return '';
+export const formatCurrency = (value, currency = 'NGN') => {
+  if (typeof value !== 'number' || isNaN(value)) return '';
+
+  const locale = currency === 'USD' ? 'en-US' : 'en-NG';
+
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,

@@ -1,14 +1,16 @@
 // Auth.jsx
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/toast-context";
 import { useAuth } from "@/store/auth";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { loadCartOnLogin } from "@/lib/supabaseCart";
+import { Eye, EyeOff } from "lucide-react"; // ✅ Correct import
+
 
 const authSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -18,11 +20,13 @@ const authSchema = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn, signUp, updateUser } = useAuth((state) => ({
     signIn: state.signIn,
     signUp: state.signUp,
     updateUser: state.updateUser,
   }));
+
 
   const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
@@ -59,32 +63,37 @@ const Auth = () => {
 
     setIsLoading(true);
 
-    try {
-      let user;
+// Inside handleSubmit
+try {
+  let user;
 
-      if (isLogin) {
-        user = await signIn(formData.email, formData.password);
-        await loadCartOnLogin();
-        toast({ title: "Welcome back!", description: "You're logged in." });
-      } else {
-        user = await signUp(formData.email, formData.password, formData.name);
-        toast({
-          title: "Account created!",
-          description: "Check your email to verify.",
-        });
-      }
+  if (isLogin) {
+    user = await signIn(formData.email, formData.password, toast);
+    await loadCartOnLogin();
+    toast({ title: "Welcome back!", description: "You're logged in." });
+  } else {
+    await signUp(formData.email, formData.password, formData.name, toast);
+    toast({
+      title: "Account Created",
+      description: "Please check your email to verify your account.",
+    });
+    return; // stop here, don’t navigate until account is verified
+  }
 
-      if (user) {
-        updateUser(user);
-        navigate("/");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Something went wrong.",
-        variant: "destructive",
-      });
-    } finally {
+  if (user) {
+    updateUser(user);
+    const redirectPath = location.state?.from || "/";
+    navigate(redirectPath);
+  }
+
+} catch (error) {
+  toast({
+    title: "Error",
+    description: error?.message || "Authentication failed.",
+    variant: "destructive",
+  });
+}
+ finally {
       setIsLoading(false);
     }
   };
@@ -152,33 +161,10 @@ const Auth = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground focus:outline-none"
+                  aria-label="Toggle password visibility"
                 >
-                  {showPassword ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path d="M17.94 17.94A10.92 10.92 0 0112 20c-5.05 0-9.29-3.14-11-8a11.05 11.05 0 012.81-4.19M9.88 9.88A3 3 0 0114.12 14.12M4.22 4.22l15.56 15.56" />
-                    </svg>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <circle cx="12" cy="12" r="3" />
-                      <path d="M2.05 12A10 10 0 0121.95 12 10 10 0 012.05 12z" />
-                    </svg>
-                  )}
+                  {showPassword ? <EyeOff /> : <Eye />}
                 </button>
                 {errors.password && (
                   <p className="text-sm text-destructive mt-1">{errors.password}</p>
