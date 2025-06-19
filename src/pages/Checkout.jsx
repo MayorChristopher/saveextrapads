@@ -19,6 +19,7 @@ import Spinner from "@/components/Spinner";
 import { saveCartToSupabase } from "@/lib/cartHelpers";
 import { convertToUSD } from "../lib/convertCurrency";
 import { z } from "zod";
+import { AlertCircle } from "lucide-react";
 
 const africanCountries = [
   {
@@ -280,32 +281,37 @@ const Checkout = () => {
   }
 
   return (
-    <div className="bg-gradient-to-b from-secondary to-background">
-      <div className="container-custom py-20">
-        <div className="grid md:grid-cols-2 gap-12">
-          {formData.country && (
-            <div className="bg-muted border border-border p-4 rounded-md text-sm mb-6">
-              <strong>Notice:</strong>{" "}
-              {formData.country === "Nigeria" ? (
-                <>
-                  You are checking out from <strong>Nigeria</strong>. Your payment method is set to{" "}
-                  <strong>Flutterwave (₦ NGN)</strong>. Shipping fees are based on your selected Nigerian city.
-                </>
-              ) : (
-                <>
-                  You are checking out from <strong>{formData.country}</strong>. Your payment method is set to{" "}
-                  <strong>PayPal ($ USD)</strong>. Shipping fees are location-based and will be converted to USD.
-                </>
-              )}
-            </div>
+ <div className="bg-gradient-to-b from-secondary to-background">
+      {/* Fixed banner at the top */}
+      <div className="fixed top-0 left-0 right-0 bg-yellow-100 text-black p-4 rounded-b-md flex items-center justify-between z-50">
+        {/* Adding the warning icon */}
+        <AlertCircle className="text-yellow-600 mr-2" size={20} />
+        <span>
+          {formData.country === "Nigeria" ? (
+            <>
+              You are checking out from <strong>Nigeria</strong>. Your payment method is set to{" "}
+              <strong>Flutterwave (₦ NGN)</strong>. Shipping fees are based on your selected Nigerian city.
+            </>
+          ) : (
+            <>
+              You are checking out from <strong>{formData.country}</strong>. Your payment method is set to{" "}
+              <strong>PayPal ($ USD)</strong>. Shipping fees are location-based and will be converted to USD.
+            </>
           )}
+        </span>
+      </div>
+      {/* Main content below the fixed banner */}
+      <div className="container-custom py-20 pt-32"> {/* Added pt-32 to create space for the fixed banner */}
+        <div className="grid md:grid-cols-2 gap-12">
+          {/* Login notice banner with icon */}
           {!user && (
-            <div className="bg-yellow-100 p-4 rounded text-center mb-6">
+            <div className="bg-yellow-100 p-4 rounded text-center mb-6 flex items-center">
+              {/* Adding the warning icon */}
+              <AlertCircle className="text-yellow-600 mr-2" size={20} />
               Please log in to complete your purchase. Your cart will be saved.
             </div>
           )}
 
-          {/* Left: Checkout Form */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 120 }}>
             <div className="glass-card p-8 rounded-xl">
               <h2 className="text-2xl font-bold mb-6">Checkout</h2>
@@ -360,7 +366,6 @@ const Checkout = () => {
             </div>
           </motion.div>
 
-          {/* Right: Order Summary */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <div className="glass-card p-8 rounded-xl">
               <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
