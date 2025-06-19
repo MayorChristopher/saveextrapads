@@ -273,25 +273,6 @@ const Checkout = () => {
 
   return (
     <div className="bg-gradient-to-b from-secondary to-background">
-      {/* Fixed banner at the top */}
-      <div className="fixed top-0 left-0 right-0 bg-yellow-100 text-black p-4 rounded-b-md flex items-center justify-between z-50">
-        {/* Adding the warning icon */}
-        <AlertCircle className="text-yellow-600 mr-2" size={20} />
-        <span>
-          {formData.country === "Nigeria" ? (
-            <>
-              You are checking out from <strong>Nigeria</strong>. Your payment method is set to{" "}
-              <strong>Flutterwave (₦ NGN)</strong>. Shipping fees are based on your selected Nigerian city.
-            </>
-          ) : (
-            <>
-              You are checking out from <strong>{formData.country}</strong>. Your payment method is set to{" "}
-              <strong>PayPal ($ USD)</strong>. Shipping fees are location-based and will be converted to USD.
-            </>
-          )}
-        </span>
-      </div>
-      {/* Main content below the fixed banner */}
       <div className="container-custom py-20 pt-32"> {/* Added pt-32 to create space for the fixed banner */}
         <div className="grid md:grid-cols-2 gap-12">
           {/* Login notice banner with icon */}
@@ -301,6 +282,24 @@ const Checkout = () => {
               Please log in to complete your purchase. Your cart will be saved.
             </div>
           )}
+
+          {/* Tooltip information directly in the form */}
+          <div className="bg-yellow-100 p-4 rounded text-center mb-6 flex items-center">
+            <AlertCircle className="text-yellow-600 mr-2" size={20} />
+            <span>
+              {formData.country === "Nigeria" ? (
+                <>
+                  You are checking out from <strong>Nigeria</strong>. Your payment method is set to{" "}
+                  <strong>Flutterwave (₦ NGN)</strong>. Shipping fees are based on your selected Nigerian city.
+                </>
+              ) : (
+                <>
+                  You are checking out from <strong>{formData.country}</strong>. Your payment method is set to{" "}
+                  <strong>PayPal ($ USD)</strong>. Shipping fees are location-based and will be converted to USD.
+                </>
+              )}
+            </span>
+          </div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 120 }}>
             <div className="glass-card p-8 rounded-xl">
