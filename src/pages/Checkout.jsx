@@ -273,34 +273,9 @@ const Checkout = () => {
 
   return (
     <div className="bg-gradient-to-b from-secondary to-background">
-      <div className="container-custom py-20 pt-32"> {/* Added pt-32 to create space for the fixed banner */}
+      <div className="container-custom py-20 pt-32">
         <div className="grid md:grid-cols-2 gap-12">
-          {/* Login notice banner with icon */}
-          {!user && (
-            <div className="bg-yellow-100 p-4 rounded text-center mb-6 flex items-center">
-              <AlertCircle className="text-yellow-600 mr-2" size={20} />
-              Please log in to complete your purchase. Your cart will be saved.
-            </div>
-          )}
-
-          {/* Tooltip information directly in the form */}
-          <div className="bg-yellow-100 p-4 rounded text-center mb-6 flex items-center">
-            <AlertCircle className="text-yellow-600 mr-2" size={20} />
-            <span>
-              {formData.country === "Nigeria" ? (
-                <>
-                  You are checking out from <strong>Nigeria</strong>. Your payment method is set to{" "}
-                  <strong>Flutterwave (₦ NGN)</strong>. Shipping fees are based on your selected Nigerian city.
-                </>
-              ) : (
-                <>
-                  You are checking out from <strong>{formData.country}</strong>. Your payment method is set to{" "}
-                  <strong>PayPal ($ USD)</strong>. Shipping fees are location-based and will be converted to USD.
-                </>
-              )}
-            </span>
-          </div>
-
+          {/* Checkout form with tooltip-like icon */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 120 }}>
             <div className="glass-card p-8 rounded-xl">
               <h2 className="text-2xl font-bold mb-6">Checkout</h2>
@@ -348,35 +323,32 @@ const Checkout = () => {
                   </SelectContent>
                 </Select>
 
+                {/* Info Tooltip Icon */}
+                <div className="relative">
+                  <AlertCircle
+                    className="text-yellow-600 cursor-pointer absolute top-0 right-0"
+                    size={20}
+                    title="Learn More"
+                  />
+                  <div className="tooltip hidden absolute top-5 right-10 text-xs bg-black text-white px-2 py-1 rounded-lg w-max">
+                    {formData.country === "Nigeria" ? (
+                      <>
+                        You are checking out from <strong>Nigeria</strong>. Your payment method is set to{" "}
+                        <strong>Flutterwave (₦ NGN)</strong>. Shipping fees are based on your selected Nigerian city.
+                      </>
+                    ) : (
+                      <>
+                        You are checking out from <strong>{formData.country}</strong>. Your payment method is set to{" "}
+                        <strong>PayPal ($ USD)</strong>. Shipping fees are location-based and will be converted to USD.
+                      </>
+                    )}
+                  </div>
+                </div>
+
                 <Button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2">
                   {isLoading ? (<><Spinner /> Processing...</>) : "Place Order"}
                 </Button>
               </form>
-            </div>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-            <div className="glass-card p-8 rounded-xl">
-              <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
-              <div className="space-y-4">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center">
-                    <span>{item.name}</span>
-                    <span>{formatCurrency(item.price, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span>
-                  </div>
-                ))}
-                <div className="border-t pt-4">
-                  <div className="flex justify-between"><span>Subtotal</span><span>{formatCurrency(subtotal, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span></div>
-                  <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span>{formatCurrency(shippingFee, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-lg">
-                    <span>Total</span>
-                    <span>{formatCurrency(total, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </motion.div>
         </div>
