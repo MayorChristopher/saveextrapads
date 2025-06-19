@@ -38,8 +38,6 @@ const checkoutSchema = z.object({
   paymentMethod: z.enum(["paypal", "flutterwave"]),
 });
 
-
-
 const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -57,7 +55,6 @@ const Checkout = () => {
         description: "Your cart will be saved and restored after login.",
       });
 
-      // Delay navigation slightly to allow toast to render
       setTimeout(() => {
         navigate("/auth", {
           state: { from: "/checkout" },
@@ -129,7 +126,6 @@ const Checkout = () => {
           description: "Unable to convert to USD. Showing NGN instead.",
           variant: "default"
         });
-
       }
     };
     computeTotal();
@@ -145,9 +141,7 @@ const Checkout = () => {
       city: updatedCity,
       paymentMethod: formData.country === "Nigeria" ? "flutterwave" : "paypal",
     }));
-
   }, [formData.country]);
-
 
   const validateForm = () => {
     const result = checkoutSchema.safeParse(formData);
@@ -217,7 +211,6 @@ const Checkout = () => {
         throw itemsError;
       }
 
-      // Handle redirect
       sessionStorage.setItem("order-meta", JSON.stringify({
         email: formData.email,
         name: formData.name,
@@ -241,7 +234,6 @@ const Checkout = () => {
         window.location.href = data.link;
         if (!data?.link) throw new Error("Payment link not received.");
         window.location.href = data.link;
-
       }
 
       if (formData.paymentMethod === "flutterwave") {
@@ -260,7 +252,6 @@ const Checkout = () => {
         window.location.href = data.link;
         if (!data?.link) throw new Error("Payment link not received.");
         window.location.href = data.link;
-
       }
 
     } catch (error) {
@@ -281,7 +272,7 @@ const Checkout = () => {
   }
 
   return (
- <div className="bg-gradient-to-b from-secondary to-background">
+    <div className="bg-gradient-to-b from-secondary to-background">
       {/* Fixed banner at the top */}
       <div className="fixed top-0 left-0 right-0 bg-yellow-100 text-black p-4 rounded-b-md flex items-center justify-between z-50">
         {/* Adding the warning icon */}
@@ -306,7 +297,6 @@ const Checkout = () => {
           {/* Login notice banner with icon */}
           {!user && (
             <div className="bg-yellow-100 p-4 rounded text-center mb-6 flex items-center">
-              {/* Adding the warning icon */}
               <AlertCircle className="text-yellow-600 mr-2" size={20} />
               Please log in to complete your purchase. Your cart will be saved.
             </div>
@@ -385,7 +375,6 @@ const Checkout = () => {
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>
                     <span>{formatCurrency(total, formData.paymentMethod === "paypal" ? "USD" : "NGN")}</span>
-
                   </div>
                 </div>
               </div>
